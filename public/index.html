@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQueue - Clinic Management</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">MediQueue</div>
+        <div class="nav-links" id="navLinks">
+            <!-- Links injected by JS based on auth state -->
+        </div>
+        <button id="logoutBtn" class="btn-secondary" style="display:none;">Logout</button>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Auth Section -->
+        <section id="authSection" class="active-section">
+            <div class="auth-box">
+                <h2 id="authTitle">Login</h2>
+                <form id="authForm">
+                    <input type="text" id="name" placeholder="Name" style="display:none;" autocomplete="name">
+                    <input type="email" id="email" placeholder="Email" required autocomplete="email">
+                    <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+                    <button type="submit" class="btn-primary" id="authBtn">Login</button>
+                </form>
+                <p id="authToggle">Don't have an account? <a href="#" id="toggleAuth">Register</a></p>
+                <p id="authError" class="error-msg"></p>
+            </div>
+        </section>
+
+        <!-- Patient Dashboard -->
+        <section id="patientDashboard" class="hidden">
+            <h1>Welcome, <span id="patientName">Patient</span></h1>
+            
+            <div class="grid-layout">
+                <!-- Booking Form -->
+                <div class="card">
+                    <h3>Book Appointment</h3>
+                    <form id="bookingForm">
+                        <select id="doctorSelect" required>
+                            <option value="">Select Doctor</option>
+                        </select>
+                        <input type="date" id="dateSelect" required>
+                        <input type="time" id="timeSelect" required>
+                        <button type="submit" class="btn-primary">Book Now</button>
+                    </form>
+                    <p id="bookingMsg" class="success-msg"></p>
+                </div>
+
+                <!-- My Appointments -->
+                <div class="card">
+                    <h3>My Appointments</h3>
+                    <ul id="myAppointmentsList" class="list-group">
+                        <!-- Items injected here -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Queue Status View (Public/Patient) -->
+        <section id="queueStatusSection" class="hidden">
+            <h1>Current Queue Status</h1>
+            <div class="queue-display">
+                <div class="queue-card current">
+                    <h3>Now Serving</h3>
+                    <div class="number" id="currentServing">--</div>
+                    <div class="patient-name" id="currentPatientName">Waiting...</div>
+                </div>
+                <div class="queue-card next">
+                    <h3>Next Up</h3>
+                    <div class="number" id="nextServing">--</div>
+                </div>
+            </div>
+            <div class="waiting-list">
+                <h3>Waiting List</h3>
+                <ul id="waitingListDisplay"></ul>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard -->
+        <section id="adminDashboard" class="hidden">
+            <h1>Admin Dashboard</h1>
+            
+            <div class="admin-controls">
+                <button onclick="showAdminView('doctors')" class="btn-secondary">Manage Doctors</button>
+                <button onclick="showAdminView('queue')" class="btn-secondary">Manage Queue</button>
+            </div>
+
+            <!-- Manage Doctors View -->
+            <div id="adminDoctorsView" class="admin-view">
+                <h3>Add Doctor</h3>
+                <form id="addDoctorForm">
+                    <input type="text" id="docName" placeholder="Name" required>
+                    <input type="text" id="docSpec" placeholder="Specialization" required>
+                    <button type="submit" class="btn-primary">Add Doctor</button>
+                </form>
+                <h3>Existing Doctors</h3>
+                <ul id="adminDoctorList" class="list-group"></ul>
+            </div>
+
+            <!-- Manage Queue View -->
+            <div id="adminQueueView" class="admin-view hidden">
+                <h3>Queue Management</h3>
+                <div class="queue-actions">
+                    <button id="callNextBtn" class="btn-primary">Call Next Patient</button>
+                    <button id="completeBtn" class="btn-secondary">Mark Completed</button>
+                </div>
+                <h4>Pending Queue</h4>
+                <ul id="adminQueueList" class="list-group"></ul>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
