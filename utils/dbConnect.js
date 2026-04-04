@@ -14,15 +14,31 @@ if (!cached) {
 }
 
 async function dbConnect() {
-  if (cached.conn) {
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI).then((connection) => connection);
+  // Recover when a warm serverless instance keeps a stale/disconnected connection.
+  if (mongoose.connection.readyState === 0) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
-  cached.conn = await cached.promise;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 5,
+      minPoolSize: 0,
+    }).then((connection) => connection);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
+
   return cached.conn;
 }
 
