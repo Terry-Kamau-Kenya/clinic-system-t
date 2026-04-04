@@ -7,7 +7,7 @@ dotenv.config();
 
 const seedDoctors = async () => {
     try {
-        console.log("Connecting to MongoDB...");
+        console.log("Connecting to MongoDB for Vercel serverless seeding...");
         await mongoose.connect(process.env.MONGO_URI);
         console.log("✅ Connected!");
 
@@ -25,7 +25,7 @@ const seedDoctors = async () => {
         ];
 
         await Doctor.insertMany(doctorData);
-        console.log("✅ Doctors Seeded Successfully!");
+        console.log("✅ Doctors seeded successfully for the Vercel serverless app!");
         
         process.exit();
     } catch (err) {

@@ -20,11 +20,11 @@ async function addDemoDoctors() {
             process.exit(1);
         }
 
-        console.log('🔄 Connecting to MongoDB...');
+        console.log('🔄 Connecting to MongoDB for Vercel serverless maintenance...');
         
         // Connect without deprecated options (they're default in new versions)
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ MongoDB Connected Successfully');
+        console.log('✅ MongoDB connected successfully for the Vercel serverless app');
         console.log(`   Database: ${mongoose.connection.db.databaseName}`);
 
         // Check for existing demo doctors
@@ -69,7 +69,7 @@ async function addDemoDoctors() {
         console.log(`   Already existed: ${existingDocs.length}`);
 
         console.log('\n🎯 Next Steps:');
-        console.log('   1. Deploy or run: vercel dev');
+        console.log('   1. Run locally with Vercel serverless: vercel dev');
         console.log('   2. Login as patient');
         console.log('   3. Book an appointment with any doctor');
 
