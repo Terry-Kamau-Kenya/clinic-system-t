@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Doctor = require('../models/Doctor');
+const { Doctor } = require('../models/schemas');
 require('dotenv').config();
 
 const demoDoctors = [
@@ -69,7 +69,7 @@ async function addDemoDoctors() {
         console.log(`   Already existed: ${existingDocs.length}`);
 
         console.log('\n🎯 Next Steps:');
-        console.log('   1. Start the server: npm start');
+        console.log('   1. Deploy or run: vercel dev');
         console.log('   2. Login as patient');
         console.log('   3. Book an appointment with any doctor');
 

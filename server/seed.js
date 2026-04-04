@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-// Import the actual Doctor model from your Schemas file
-const { Doctor } = require('./models/Schemas'); 
+// Import the canonical schema bundle used by serverless API handlers
+const { Doctor } = require('./models/schemas'); 
 
 dotenv.config();
 

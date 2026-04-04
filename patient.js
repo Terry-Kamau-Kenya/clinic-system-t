@@ -1,7 +1,7 @@
-const DOCTOR_API_URL = 'http://localhost:5000/api/doctors';
-const APPOINTMENT_API_URL = 'http://localhost:5000/api/appointments';
+const DOCTOR_API_URL = '/api/doctors';
+const APPOINTMENT_API_URL = '/api/appointments';
 // New URL for fetching status
-const STATUS_API_URL = 'http://localhost:5000/api/appointments/my'; 
+const STATUS_API_URL = '/api/appointments/my'; 
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Patient Dashboard Initializing...");

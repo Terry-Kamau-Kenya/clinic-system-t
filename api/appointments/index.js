@@ -1,4 +1,4 @@
-const { dbConnect, Doctor, Appointment, requireUser } = require('./_lib/clinic');
+const { dbConnect, User, Doctor, Appointment, requireUser } = require('../_lib/clinic');
 
 module.exports = async function handler(req, res) {
   await dbConnect();
@@ -57,7 +57,7 @@ module.exports = async function handler(req, res) {
 
       return res.json(appointments);
     } catch (error) {
-      console.error('Appointment fetch error:', error);
+      console.error('Appointment list error:', error);
       return res.status(500).json({ message: 'Server error' });
     }
   }

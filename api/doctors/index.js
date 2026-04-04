@@ -1,4 +1,4 @@
-const { dbConnect, Doctor, requireRole } = require('./_lib/clinic');
+const { dbConnect, Doctor, requireRole } = require('../_lib/clinic');
 
 module.exports = async function handler(req, res) {
   await dbConnect();
@@ -32,7 +32,10 @@ module.exports = async function handler(req, res) {
         status: status || 'available',
       });
 
-      return res.status(201).json({ message: 'Doctor added successfully', doctor });
+      return res.status(201).json({
+        message: 'Doctor added successfully',
+        doctor,
+      });
     } catch (error) {
       console.error('Doctor create error:', error);
       return res.status(500).json({ message: 'Server error while adding doctor' });
