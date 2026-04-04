@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadAllAppointments() {
     const tableBody = document.getElementById('adminApptBody');
     try {
-        const res = await fetch('http://localhost:5000/api/appointments/admin', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+const res = await fetch('/api/appointments/admin', {
+    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const appointments = await res.json();
 
@@ -35,7 +35,7 @@ async function loadAllAppointments() {
 }
 
 async function updateStatus(id, status) {
-    await fetch(`http://localhost:5000/api/queue/update/${id}`, {
+    await fetch(`/api/queue/update/${id}`, {
         method: 'PUT',
         headers: { 
             'Content-Type': 'application/json',

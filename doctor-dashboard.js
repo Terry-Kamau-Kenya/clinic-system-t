@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${apptId}/complete`, {
+            const res = await fetch(`/api/appointments/${apptId}/complete`, {
                 method: 'PATCH',
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -66,7 +66,7 @@ async function loadDoctorQueue() {
     const nextBtn = document.getElementById('btnNextPatient');
 
     try {
-        const res = await fetch('http://localhost:5000/api/doctor/queue', {
+        const res = await fetch(`/api/appointments/doctor/queue`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

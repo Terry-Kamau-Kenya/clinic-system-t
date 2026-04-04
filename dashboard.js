@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             console.log("🔄 Fetching doctors from server...");
-            const response = await fetch('http://localhost:5000/api/doctors');
+            const response = await fetch('/api/doctors');
             const doctors = await response.json();
 
             console.log("✅ Doctors received:", doctors);
