@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 authError.innerText = data.message || "An error occurred.";
             }
         } catch (err) {
-            authError.innerText = "Connection failed. Please ensure the backend server is running.";
+            authError.innerText = "Connection failed. Please try again in a moment.";
             console.error("Auth Error:", err);
         }
     });

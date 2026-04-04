@@ -2,6 +2,32 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { dbConnect, User, publicUser } = require('../_lib/clinic');
 
+function parseBody(req) {
+  let payload;
+
+  try {
+    payload = req.body;
+  } catch (error) {
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (payload == null) {
+    return {};
+  }
+
+  if (typeof payload === 'string') {
+    try {
+      return JSON.parse(payload);
+    } catch (error) {
+      error.statusCode = 400;
+      throw error;
+    }
+  }
+
+  return payload;
+}
+
 module.exports = async function handler(req, res) {
   await dbConnect();
 
@@ -10,7 +36,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role } = parseBody(req);
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
@@ -42,6 +68,10 @@ module.exports = async function handler(req, res) {
       user: publicUser(user),
     });
   } catch (error) {
+    if (error && (error.statusCode === 400 || /invalid json/i.test(String(error.message)))) {
+      return res.status(400).json({ message: 'Invalid request payload. Please try again.' });
+    }
+
     console.error('Registration error:', error);
     return res.status(500).json({ message: 'Server error' });
   }
