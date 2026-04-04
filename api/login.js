@@ -1,5 +1,5 @@
 // 1. BASE URL (Points to your Express Server)
-const BASE_URL = 'http://localhost:5000/api/auth'; 
+const BASE_URL = "https://your-render-app-name.onrender.com/api"; 
 
 const loginForm = document.getElementById('loginForm');
 
