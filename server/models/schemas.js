@@ -52,6 +52,9 @@ const appointmentSchema = new mongoose.Schema({
     queueNumber: { type: Number }
 }, { timestamps: true });
 
+appointmentSchema.index({ doctorId: 1, date: 1 });
+appointmentSchema.index({ patientId: 1 });
+
 const User = mongoose.model('User', userSchema);
 const Doctor = mongoose.model('Doctor', doctorSchema);
 const Appointment = mongoose.model('Appointment', appointmentSchema);
