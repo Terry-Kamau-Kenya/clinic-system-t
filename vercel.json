@@ -2,16 +2,20 @@
   "version": 2,
   "rewrites": [
     { 
-      "source": "/api/register", 
+      "source": "/api/auth/register", 
       "destination": "/api/auth/register.js" 
     },
     { 
-      "source": "/api/login", 
+      "source": "/api/auth/login", 
       "destination": "/api/auth/login.js" 
     },
     { 
       "source": "/api/doctors", 
       "destination": "/api/doctors/index.js" 
+    },
+    { 
+      "source": "/api/doctors/:id", 
+      "destination": "/api/doctors/[id].js" 
     },
     { 
       "source": "/api/appointments", 
