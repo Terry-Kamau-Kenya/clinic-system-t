@@ -28,8 +28,6 @@ async function dbConnect() {
   if (!cached.promise) {
     console.log('Creating new connection promise');
     cached.promise = mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 30000,
       maxPoolSize: 5,
       minPoolSize: 0,
