@@ -1,5 +1,8 @@
-// ✅ FIX: Changed from '/api/auth' to '/api' to match your vercel.json rewrites
-const API_URL = '/api'; 
+// 🔄 AUTO-DETECT API URL: 
+// If on localhost, use the full Vercel link. If on Vercel, use relative '/api'.
+const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+    ? 'https://clinic-system-t.vercel.app/api' 
+    : '/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.getElementById('authForm');
@@ -11,35 +14,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let isLogin = true;
 
     // 1. Toggle between Login and Register
-    toggleAuth.addEventListener('click', (e) => {
-        e.preventDefault();
-        isLogin = !isLogin;
-        
-        authError.innerText = "";
-        if (nameField) nameField.style.display = isLogin ? 'none' : 'block';
-        authTitle.innerText = isLogin ? 'Login to MediQueue' : 'Register Account';
-        authBtn.innerHTML = isLogin ? '<i class="fas fa-sign-in-alt"></i> Login' : '<i class="fas fa-user-plus"></i> Register';
-        toggleAuth.innerText = isLogin ? 'Register here' : 'Login here';
-    });
+    if (toggleAuth) {
+        toggleAuth.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLogin = !isLogin;
+            
+            if (authError) authError.innerText = "";
+            if (nameField) nameField.style.display = isLogin ? 'none' : 'block';
+            if (authTitle) authTitle.innerText = isLogin ? 'Login to MediQueue' : 'Register Account';
+            if (authBtn) {
+                authBtn.innerHTML = isLogin 
+                    ? '<i class="fas fa-sign-in-alt"></i> Login' 
+                    : '<i class="fas fa-user-plus"></i> Register';
+            }
+            toggleAuth.innerText = isLogin ? 'Register here' : 'Login here';
+        });
+    }
 
     // 2. Handle Form Submission
     authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        authError.innerText = ""; // Clear previous errors
+        if (authError) authError.innerText = ""; 
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
-        // ✅ FIX: Safer check for the name field
+        // Safer check for the name field
         const nameInput = document.getElementById('regName');
         const name = nameInput ? nameInput.value : '';
 
-        // This creates '/api/login' or '/api/register'
         const endpoint = isLogin ? '/login' : '/register';
         
         const body = isLogin 
             ? { email, password } 
             : { name, email, password, role: 'patient' }; 
+
+        console.log(`Connecting to: ${API_URL}${endpoint}`); // Helpful for debugging F12
 
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
@@ -51,7 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Handle non-JSON responses (like 404s or 500s)
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Server did not return JSON. Check Vercel logs.");
+                const errorText = await res.text();
+                console.error("Server Response:", errorText);
+                throw new Error("Server error. Check Vercel Logs for database connection issues.");
             }
 
             const data = await res.json();
@@ -61,19 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                if (isLogin) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    alert("Registration successful! Redirecting to dashboard...");
-                    window.location.href = 'dashboard.html'; 
-                }
+                alert(isLogin ? "Login successful!" : "Registration successful!");
+                window.location.href = 'dashboard.html'; 
             } else {
                 authError.innerText = data.message || "An error occurred.";
             }
         } catch (err) {
-            // This catches network errors OR manual throws from above
-            authError.innerText = "Connection failed. Ensure you have pushed your latest vercel.json and check Vercel Logs.";
-            console.error("Auth Error:", err);
+            authError.innerText = err.message || "Connection failed.";
+            console.error("Auth Error details:", err);
         }
     });
 });
