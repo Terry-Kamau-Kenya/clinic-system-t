@@ -41,6 +41,12 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ message: 'Server error', debug: 'User model not loaded' });
   }
 
+  // TEMP DEBUG: Check if models are loaded
+  if (!User || typeof User.findOne !== 'function') {
+    console.error('User model not loaded properly');
+    return res.status(500).json({ message: 'Server error', debug: 'User model not loaded' });
+  }
+
   try {
     const { name, email, password, role } = parseBody(req);
 
