@@ -1,4 +1,18 @@
-const bcrypt = require('bcryptjs');
+export default async function handler(req, res) {
+    // 🔓 Allow your local machine to talk to Vercel
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins for testing
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+    // Handle the OPTIONS pre-flight request
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // ... rest of your database connection and registration code ...
+}const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { dbConnect, getModels, publicUser } = require('../_lib/clinic');
 

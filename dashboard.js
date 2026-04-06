@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nameDisplay.innerText = `Welcome, ${user.name}`;
     }
 
-    console.log("Current User Email in Dashboard:", user.email);
-
     // 3. Show the correct view based on role
     const adminView = document.getElementById('adminView');
     const patientView = document.getElementById('patientView');
@@ -26,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (adminView) adminView.classList.remove('hidden');
     } else {
         if (patientView) patientView.classList.remove('hidden');
-        // --- NEW: Load doctors if the user is a patient ---
         loadDoctorsIntoDropdown();
     }
 
@@ -39,40 +36,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. --- NEW FUNCTION: FETCH DOCTORS ---
+    // 5. Load Doctors into Dropdown
     async function loadDoctorsIntoDropdown() {
-        const doctorSelect = document.getElementById('doctorSelect'); // CHECK: Your <select> must have this ID
-        
-        if (!doctorSelect) {
-            console.log("DEBUG: doctorSelect element not found on this page.");
-            return;
-        }
+        const doctorSelect = document.getElementById('doctorSelect');
+        if (!doctorSelect) return;
 
         try {
-            console.log("🔄 Fetching doctors from server...");
             const response = await fetch('/api/doctors');
             const doctors = await response.json();
 
-            console.log("✅ Doctors received:", doctors);
-
-            // Clear the dropdown and add default option
             doctorSelect.innerHTML = '<option value="">-- Select a Doctor --</option>';
-
-            if (doctors.length === 0) {
-                doctorSelect.innerHTML += '<option disabled>No doctors found in database</option>';
-                return;
-            }
-
-            // Fill dropdown with doctors from DB
             doctors.forEach(doc => {
                 const option = document.createElement('option');
-                option.value = doc._id;
+                option.value = doc._id; // Ensure this is doc._id from MongoDB
                 option.textContent = `${doc.name} (${doc.specialization})`;
                 doctorSelect.appendChild(option);
             });
-
         } catch (error) {
             console.error("❌ Error loading doctors:", error);
         }
+    }
+
+    // 6. 🔥 NEW: HANDLE BOOKING SUBMISSION (The fix for your 500 error)
+    const bookingForm = document.getElementById('bookingForm'); // Ensure your <form> has this ID
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const doctorId = document.getElementById('doctorSelect').value;
+            const date = document.getElementById('appointmentDate').value;
+            const time = document.getElementById('appointmentTime').value;
+
+            if (!doctorId || !date || !time) {
+                alert("Please fill in all booking details.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/appointments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // 🔑 CRITICAL: Sends your login token to the server
+                    },
+                    body: JSON.stringify({ doctorId, date, time })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Booking Confirmed Successfully!");
+                    bookingForm.reset();
+                    // Optional: window.location.reload(); 
+                } else {
+                    alert("Error: " + (data.message || "Failed to book appointment"));
+                }
+            } catch (error) {
+                console.error("❌ Booking Error:", error);
+                alert("Connection failed. Check your console (F12).");
+            }
+        });
     }
 });
