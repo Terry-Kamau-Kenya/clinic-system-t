@@ -71,12 +71,7 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ message: 'Invalid request payload. Please try again.' });
     }
 
-    // TEMP DEBUG: Log error details for production diagnosis
-    console.error('Login error details:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack?.split('\n')[0], // First line only
-    });
-    return res.status(500).json({ message: 'Server error', debug: error.message });
+    console.error('Login error:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

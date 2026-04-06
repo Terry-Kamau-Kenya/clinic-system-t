@@ -9,12 +9,8 @@ module.exports = async function handler(req, res) {
       const doctors = await Doctor.find({}).sort({ name: 1 });
       return res.json(doctors);
     } catch (error) {
-      console.error('Doctors list error details:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack?.split('\n')[0],
-      });
-      return res.status(500).json({ message: 'Server error while fetching doctors', debug: error.message });
+      console.error('Doctors list error:', error);
+      return res.status(500).json({ message: 'Server error while fetching doctors' });
     }
   }
 
@@ -43,12 +39,8 @@ module.exports = async function handler(req, res) {
         doctor,
       });
     } catch (error) {
-      console.error('Doctor create error details:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack?.split('\n')[0],
-      });
-      return res.status(500).json({ message: 'Server error while adding doctor', debug: error.message });
+      console.error('Doctor create error:', error);
+      return res.status(500).json({ message: 'Server error while adding doctor' });
     }
   }
 
