@@ -2,54 +2,26 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { dbConnect, getModels, publicUser } = require('../_lib/clinic');
 
-function parseBody(req) {
-  let payload;
-
-  try {
-    payload = req.body;
-  } catch (error) {
-    error.statusCode = 400;
-    throw error;
-  }
-
-  if (payload == null) {
-    return {};
-  }
-
-  if (typeof payload === 'string') {
-    try {
-      return JSON.parse(payload);
-    } catch (error) {
-      error.statusCode = 400;
-      throw error;
-    }
-  }
-
-  return payload;
-}
-
 module.exports = async function handler(req, res) {
+  // 1. Ensure DB Connection
   await dbConnect();
 
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { User } = await getModels();
-
-  // TEMP DEBUG: Check if models are loaded
-  if (!User || typeof User.findOne !== 'function') {
-    console.error('User model not loaded properly');
-    return res.status(500).json({ message: 'Server error', debug: 'User model not loaded' });
-  }
-
   try {
-    const { name, email, password, role } = parseBody(req);
+    // 2. Vercel usually parses this automatically. 
+    // If it's already an object, use it. If it's a string, parse it.
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { name, email, password, role } = body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
+    const { User } = await getModels();
+    
     const normalizedEmail = String(email).trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
 
@@ -75,12 +47,9 @@ module.exports = async function handler(req, res) {
       token,
       user: publicUser(user),
     });
-  } catch (error) {
-    if (error && (error.statusCode === 400 || /invalid json/i.test(String(error.message)))) {
-      return res.status(400).json({ message: 'Invalid request payload. Please try again.' });
-    }
 
+  } catch (error) {
     console.error('Registration error:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
