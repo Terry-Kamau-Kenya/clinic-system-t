@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { dbConnect, User, publicUser } = require('../_lib/clinic');
+const { dbConnect, getModels, publicUser } = require('../_lib/clinic');
 
 function parseBody(req) {
   let payload;
@@ -35,11 +35,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // TEMP DEBUG: Check if models are loaded
-  if (!User || typeof User.findOne !== 'function') {
-    console.error('User model not loaded properly');
-    return res.status(500).json({ message: 'Server error', debug: 'User model not loaded' });
-  }
+  const { User } = await getModels();
 
   // TEMP DEBUG: Check if models are loaded
   if (!User || typeof User.findOne !== 'function') {

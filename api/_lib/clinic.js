@@ -1,6 +1,18 @@
 const dbConnect = require('../../utils/dbConnect');
 const jwt = require('jsonwebtoken');
-const { User, Doctor, Appointment } = require('../../server/models/schemas');
+
+let User, Doctor, Appointment;
+
+async function getModels() {
+  await dbConnect();
+  if (!User) {
+    const { User: U, Doctor: D, Appointment: A } = require('../../server/models/schemas');
+    User = U;
+    Doctor = D;
+    Appointment = A;
+  }
+  return { User, Doctor, Appointment };
+}
 
 function getBearerToken(req) {
   const header = req.headers.authorization || req.headers.Authorization || '';
@@ -30,6 +42,7 @@ async function requireUser(req, res) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { User } = await getModels();
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -64,6 +77,8 @@ async function resolveDoctorForUser(user) {
     return null;
   }
 
+  const { Doctor } = await getModels();
+
   if (user.doctorId) {
     const doctorById = await Doctor.findById(user.doctorId);
     if (doctorById) {
@@ -90,9 +105,7 @@ async function resolveDoctorForUser(user) {
 
 module.exports = {
   dbConnect,
-  User,
-  Doctor,
-  Appointment,
+  getModels,
   publicUser,
   requireUser,
   requireRole,

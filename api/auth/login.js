@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { dbConnect, User, publicUser } = require('../_lib/clinic');
+const { dbConnect, getModels, publicUser } = require('../_lib/clinic');
 
 function parseBody(req) {
   let payload;
@@ -34,6 +34,8 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
+
+  const { User } = await getModels();
 
   try {
     const { email, password } = parseBody(req);
