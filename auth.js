@@ -1,5 +1,5 @@
 // ✅ FIX: Changed from '/api/auth' to '/api' to match your vercel.json rewrites
-const API_URL = '/api/auth'; 
+const API_URL = '/api'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const authForm = document.getElementById('authForm');
