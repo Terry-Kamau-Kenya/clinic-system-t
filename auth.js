@@ -1,5 +1,4 @@
 // 🔄 AUTO-DETECT API URL: 
-// If on localhost, use the full Vercel link. If on Vercel, use relative '/api'.
 const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
     ? 'https://clinic-system-t.vercel.app/api' 
     : '/api';
@@ -34,42 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Handle Form Submission
     authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (authError) authError.innerText = ""; 
+        if (authError) authError.innerText = "Processing..."; 
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        
-        // Safer check for the name field
         const nameInput = document.getElementById('regName');
         const name = nameInput ? nameInput.value : '';
 
-        const endpoint = isLogin ? '/login' : '/register';
+        // 🛠️ FIX: Point to the 'auth' subfolder in your api directory
+        const endpoint = isLogin ? '/auth/login' : '/auth/register';
         
         const body = isLogin 
             ? { email, password } 
             : { name, email, password, role: 'patient' }; 
 
-        console.log(`Connecting to: ${API_URL}${endpoint}`); // Helpful for debugging F12
+        const fullURL = `${API_URL}${endpoint}`;
+        console.log(`Connecting to: ${fullURL}`);
 
         try {
-            const res = await fetch(`${API_URL}${endpoint}`, {
+            const res = await fetch(fullURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
 
-            // Handle non-JSON responses (like 404s or 500s)
+            // 🛠️ FIX: Check if the response is actually JSON before parsing
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const errorText = await res.text();
-                console.error("Server Response:", errorText);
-                throw new Error("Server error. Check Vercel Logs for database connection issues.");
+                console.error("Server raw response:", errorText);
+                throw new Error("Server error (500). Please check Vercel Logs for MongoDB connection issues.");
             }
 
             const data = await res.json();
 
             if (res.ok) {
-                // Save the ENTIRE user object and token
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -79,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 authError.innerText = data.message || "An error occurred.";
             }
         } catch (err) {
-            authError.innerText = err.message || "Connection failed.";
-            console.error("Auth Error details:", err);
+            // 🛠️ FIX: More descriptive error for the user
+            authError.innerText = "Connection Failed. Ensure your MongoDB URI is set in Vercel.";
+            console.error("Full Error Object:", err);
         }
     });
 });
