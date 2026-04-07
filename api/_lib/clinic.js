@@ -1,4 +1,4 @@
-const dbConnect = require('./dbConnect'); // Matches the file in the same folder
+const dbConnect = require('./dbConnect'); // Looks in the same folder
 const jwt = require('jsonwebtoken');
 
 let User, Doctor, Appointment;
@@ -10,7 +10,7 @@ let User, Doctor, Appointment;
 async function getModels() {
   await dbConnect();
   if (!User) {
-    // This points to schemas.js in the same folder
+    // This looks for schemas.js in the same folder as clinic.js
     const { User: U, Doctor: D, Appointment: A } = require('./schemas'); 
     User = U;
     Doctor = D;
