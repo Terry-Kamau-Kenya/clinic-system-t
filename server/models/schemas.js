@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// 1. USER SCHEMA
+// --- 1. USER SCHEMA ---
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// Required for auth.js to send the email correctly
 userSchema.methods.getPublicProfile = function() {
     return {
         id: this._id,
@@ -29,23 +28,22 @@ userSchema.methods.getPublicProfile = function() {
     };
 };
 
-// 2. DOCTOR SCHEMA 
-// UPDATED: Matches your MongoDB Compass screenshot exactly
+// --- 2. DOCTOR SCHEMA ---
 const doctorSchema = new mongoose.Schema({
     name: { type: String, required: true },
     specialization: { type: String, required: true },
-    email: { type: String }, // Added because it's in your DB
-    role: { type: String },  // Added because it's in your DB
-    status: { type: String, default: 'available' } // Changed from 'availability' to 'status'
+    email: { type: String }, 
+    role: { type: String },  
+    status: { type: String, default: 'available' } 
 }, { 
-    collection: 'doctors', // 👈 Forces Mongoose to use the "doctors" collection
+    collection: 'doctors', 
     timestamps: true 
 });
 
-// 3. APPOINTMENT SCHEMA
+// --- 3. APPOINTMENT SCHEMA ---
 const appointmentSchema = new mongoose.Schema({
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true }, // Points to Doctor model
+    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true }, 
     date: { type: String, required: true },
     time: { type: String, required: true },
     status: { type: String, enum: ['pending', 'serving', 'completed', 'cancelled'], default: 'pending' },
@@ -55,8 +53,12 @@ const appointmentSchema = new mongoose.Schema({
 appointmentSchema.index({ doctorId: 1, date: 1 });
 appointmentSchema.index({ patientId: 1 });
 
-const User = mongoose.model('User', userSchema);
-const Doctor = mongoose.model('Doctor', doctorSchema);
-const Appointment = mongoose.model('Appointment', appointmentSchema);
+// --- VERCEL FIX: MODEL EXPORTS ---
+// Use mongoose.models[Name] || mongoose.model(Name, Schema)
+// This prevents the "OverwriteModelError" in Vercel.
+
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Doctor = mongoose.models.Doctor || mongoose.model('Doctor', doctorSchema);
+const Appointment = mongoose.models.Appointment || mongoose.model('Appointment', appointmentSchema);
 
 module.exports = { User, Doctor, Appointment };

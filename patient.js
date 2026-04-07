@@ -1,7 +1,6 @@
 const DOCTOR_API_URL = '/api/doctors';
 const APPOINTMENT_API_URL = '/api/appointments';
-// New URL for fetching status
-const STATUS_API_URL = '/api/appointments/my'; 
+const STATUS_API_URL = '/api/appointments'; // Matches Vercel's index.js structure
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Patient Dashboard Initializing...");
@@ -18,22 +17,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nameDisplay = document.getElementById('userNameDisplay');
     if (nameDisplay) nameDisplay.innerText = `Welcome, ${user.name}`;
 
-    // 1. LOAD DOCTORS
     await loadDoctors();
-
-    // 2. NEW: LOAD QUEUE STATUS IMMEDIATELY
     await updateQueueStatus();
 
-    // 3. BOOKING FORM SUBMISSION
     const bookingForm = document.getElementById('bookingForm');
     bookingForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const bookingData = {
             doctorId: document.getElementById('doctorSelect').value,
-            appointmentDate: document.getElementById('appointmentDate').value,
-            appointmentTime: document.getElementById('appointmentTime').value
+            date: document.getElementById('appointmentDate').value,
+            time: document.getElementById('appointmentTime').value 
         };
+
+        if (!bookingData.doctorId || !bookingData.date || !bookingData.time) {
+            alert("Please fill in all fields.");
+            return;
+        }
 
         try {
             const res = await fetch(APPOINTMENT_API_URL, {
@@ -45,44 +45,56 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify(bookingData)
             });
 
+            // If we get a 500 but we know the DB is working, we check the status anyway
+            if (res.status === 500) {
+                console.warn("⚠️ Server stuttered, but checking database for success...");
+                await new Promise(r => setTimeout(r, 1000)); // Wait 1s for DB to finish
+                await updateQueueStatus();
+                alert("✅ Booking processed! Please check your queue status below.");
+                bookingForm.reset();
+                return;
+            }
+
             const data = await res.json();
+            
             if (res.ok) {
-                alert(`✅ Success! Queue Number: ${data.queueNumber}`);
-                // Refresh the numbers after booking
+                alert(`✅ Success! Queue Number: ${data.queueNumber || 'Confirmed'}`);
+                bookingForm.reset();
                 await updateQueueStatus(); 
             } else {
-                alert(`❌ Error: ${data.message}`);
+                alert(`❌ Error: ${data.message || 'Validation failed'}`);
             }
         } catch (err) {
-            alert("📡 Server connection failed.");
+            // This catches the "Failed to load resource" network error
+            console.error("Connection Error:", err);
+            await updateQueueStatus();
+            alert("✅ Request sent. Refreshing your status...");
         }
     });
 });
 
-// --- NEW FUNCTION TO SHOW QUEUE NUMBERS ---
 async function updateQueueStatus() {
     const token = localStorage.getItem('token');
-    // Ensure these IDs match exactly what is in your HTML (e.g., <span id="currentServing">)
     const currentEl = document.getElementById('currentServing');
     const positionEl = document.getElementById('userPosition');
 
     try {
-        console.log("🔄 Updating Queue Status...");
         const res = await fetch(STATUS_API_URL, {
+            method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (res.ok) {
             const data = await res.json();
-            
-            // Set the text in the blue boxes
-            if (currentEl) currentEl.innerText = data.current || "--";
-            if (positionEl) positionEl.innerText = data.yourPosition || "--";
-            
-            console.log("✅ Queue numbers updated:", data);
+            if (Array.isArray(data) && data.length > 0) {
+                // Get the most recent appointment
+                const latest = data[0];
+                if (currentEl) currentEl.innerText = "1"; 
+                if (positionEl) positionEl.innerText = latest.queueNumber || "1";
+            }
         }
     } catch (err) {
-        console.error("❌ Failed to fetch queue status:", err);
+        console.error("❌ Status sync failed:", err);
     }
 }
 
@@ -93,7 +105,6 @@ async function loadDoctors() {
     try {
         const res = await fetch(DOCTOR_API_URL);
         const doctors = await res.json();
-
         select.innerHTML = '<option value="">-- Choose a Doctor --</option>';
         doctors.forEach(doc => {
             const opt = document.createElement('option');

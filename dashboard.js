@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const userData = localStorage.getItem('user');
     const token = localStorage.getItem('token');
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             doctorSelect.innerHTML = '<option value="">-- Select a Doctor --</option>';
             doctors.forEach(doc => {
                 const option = document.createElement('option');
-                option.value = doc._id; // Ensure this is doc._id from MongoDB
+                option.value = doc._id; 
                 option.textContent = `${doc.name} (${doc.specialization})`;
                 doctorSelect.appendChild(option);
             });
@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 6. 🔥 NEW: HANDLE BOOKING SUBMISSION (The fix for your 500 error)
-    const bookingForm = document.getElementById('bookingForm'); // Ensure your <form> has this ID
+    // 6. FIXED: HANDLE BOOKING SUBMISSION
+    const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // 🔑 CRITICAL: Sends your login token to the server
+                        'Authorization': `Bearer ${token}` 
                     },
                     body: JSON.stringify({ doctorId, date, time })
                 });
@@ -85,15 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert("Booking Confirmed Successfully!");
+                    alert(`✅ Booking Confirmed! Queue Number: ${data.queueNumber || 'N/A'}`);
                     bookingForm.reset();
-                    // Optional: window.location.reload(); 
                 } else {
+                    // This alerts you if the server sends back an error message (like 401 or 500)
                     alert("Error: " + (data.message || "Failed to book appointment"));
                 }
             } catch (error) {
                 console.error("❌ Booking Error:", error);
-                alert("Connection failed. Check your console (F12).");
+                alert("📡 Connection failed. Ensure you are online and check F12 for details.");
             }
         });
     }

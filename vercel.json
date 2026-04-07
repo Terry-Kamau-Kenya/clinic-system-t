@@ -1,29 +1,11 @@
 {
   "version": 2,
   "rewrites": [
-    { 
-      "source": "/api/auth/register", 
-      "destination": "/api/auth/register.js" 
-    },
-    { 
-      "source": "/api/auth/login", 
-      "destination": "/api/auth/login.js" 
-    },
-    { 
-      "source": "/api/doctors", 
-      "destination": "/api/doctors/index.js" 
-    },
-    { 
-      "source": "/api/doctors/:id", 
-      "destination": "/api/doctors/[id].js" 
-    },
-    { 
-      "source": "/api/appointments", 
-      "destination": "/api/appointments/index.js" 
-    },
-    { 
-      "source": "/(.*)", 
-      "destination": "/$1" 
-    }
+    { "source": "/api/auth/register", "destination": "/api/auth/register.js" },
+    { "source": "/api/auth/login", "destination": "/api/auth/login.js" },
+    { "source": "/api/doctors", "destination": "/api/doctors/index.js" },
+    { "source": "/api/appointments", "destination": "/api/appointments/index.js" },
+    { "source": "/api/appointments/my", "destination": "/api/appointments/index.js" },
+    { "source": "/(.*)", "destination": "/$1" }
   ]
 }
