@@ -1,5 +1,5 @@
 const { dbConnect, requireUser } = require('../_lib/clinic');
-const { Appointment } = require('../_lib/schema');
+const { Appointment } = require('../_lib/schemas');
 
 module.exports = async function handler(req, res) {
     await dbConnect();
