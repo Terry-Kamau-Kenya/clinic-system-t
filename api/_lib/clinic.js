@@ -1,12 +1,17 @@
-const dbConnect = require('../../utils/dbConnect');
+const dbConnect = require('./dbConnect'); // Matches the file in the same folder
 const jwt = require('jsonwebtoken');
 
 let User, Doctor, Appointment;
 
+/**
+ * Ensures database is connected and models are loaded.
+ * Uses local relative paths to avoid Vercel deployment errors.
+ */
 async function getModels() {
   await dbConnect();
   if (!User) {
-    const { User: U, Doctor: D, Appointment: A } = require('../../server/models/schemas');
+    // This points to schemas.js in the same folder
+    const { User: U, Doctor: D, Appointment: A } = require('./schemas'); 
     User = U;
     Doctor = D;
     Appointment = A;
