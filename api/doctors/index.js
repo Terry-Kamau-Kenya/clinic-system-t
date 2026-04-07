@@ -1,5 +1,5 @@
 const { dbConnect } = require('../_lib/clinic');
-const { Doctor } = require('../_lib/schema'); // Import directly from your schema file
+const { Doctor } = require('../_lib/schemas'); // Import directly from your schema file
 const { requireRole } = require('../_lib/clinic');
 
 module.exports = async function handler(req, res) {
